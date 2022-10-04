@@ -28,9 +28,9 @@ async def start(ctx, study_time=50, rest_time=10, microfone=1):
             while len(channel.members) > 1 and bot.voice_clients != None: # el lio del problema que me dijo gg está en lo de bot.voice_clients pero no acabo de entenderlo
                 countdown = study_time
                 # Se reproduce el sonido de comienzo
-                vc.play(discord.FFmpegOpusAudio(
+                """ vc.play(discord.FFmpegOpusAudio(
                         source='/home/ubuntu/pomodoro/src/study.mp3')
-                        )
+                        ) """
                 # Se mutea a los miembros
                 if microfone == 1:
                     for i in channel.members:
@@ -40,7 +40,7 @@ async def start(ctx, study_time=50, rest_time=10, microfone=1):
 
                 # Se envía el mensaje de comienzo
                 embed = discord.Embed(title='Sesión de estudio de {} minutos'.format(
-                    study_time), description='Quedan {} minutos'.format(countdown), color=0xFFF14A)
+                    study_time), description='Quedan {} minutos'.format(countdown), color=0x2A033A)
                 msg = await ctx.send(embed=embed)
 
                 # Se espera el timpo de estudio
@@ -60,7 +60,7 @@ async def start(ctx, study_time=50, rest_time=10, microfone=1):
                                     study_time),
                                 description='Quedan {} minutos'.format(
                                     countdown),
-                                color=0xFFF14A)
+                                color=0x2A033A)
                         )
 
                     # print(countdown)
@@ -118,16 +118,16 @@ async def start(ctx, study_time=50, rest_time=10, microfone=1):
                 embed = discord.Embed(title='Descanso de {} minutos'.format(rest_time),
                                       description='Quedan {} minutos \n\n ¿Qué tal fue la sesión de estudio? Puedes indicar aquí tu nivel de cansancio a través de los emojis.'.format(
                                           countdown),
-                                      color=0x4ADCFF)
+                                      color=0x6D3588)
                 embed.add_field(name='Para consultar tus estadísticas,',
                                 value='[haz click aquí](https://pomodorobot.infinityfreeapp.com/)',
                                 inline=True)
 
                 msg = await ctx.send(embed=embed, view=view)
                 # Se reproduce el sonido de descanso
-                vc.play(discord.FFmpegOpusAudio(
+                """ vc.play(discord.FFmpegOpusAudio(
                         source='/home/ubuntu/pomodoro/src/rest.mp3')
-                        )
+                        ) """
                 # Se espera el timpo de descanso
 
                 i = 0
@@ -138,16 +138,16 @@ async def start(ctx, study_time=50, rest_time=10, microfone=1):
                     j = j + 1
                     quinceleft = int(rest_time)*60 - 15
                     if i == quinceleft:
-                        vc.play(discord.FFmpegOpusAudio(
+                        """ vc.play(discord.FFmpegOpusAudio(
                         source='/home/ubuntu/pomodoro/src/quinceleft.mp3')
-                        )
+                        ) """
                     if j == 60:
                         countdown = countdown - 1
                         j = 0
                         await msg.edit(embed=discord.Embed(title='Descanso de {} minutos'.format(rest_time),
                                                            description='Quedan {} minutos \n\n ¿Qué tal fue la sesión de estudio? Puedes indicar aquí tu nivel de cansancio a través de los emojis.'.format(
                                                            countdown),
-                                                           color=0x4ADCFF).add_field(name='Para consultar tus estadísticas,', value='[haz click aquí](https://pomodorobot.infinityfreeapp.com/)',inline=True))
+                                                           color=0x6D3588).add_field(name='Para consultar tus estadísticas,', value='[haz click aquí](https://pomodorobot.infinityfreeapp.com/)',inline=True))
                     if len(channel.members) == 1 or bot.voice_clients == None:
                         break
 
@@ -199,7 +199,7 @@ async def program(ctx, start_time, study_time=50, rest_time=10):
         time_left = h1 - h2
         time_left = str(time_left)[:4]
         embed = discord.Embed(title=' Su sesión de estudio empezará a las {}'.format(
-                    start_time), description='Quedan {} para que empiece su sesión de estudio'.format(time_left), color=0xFFF14A)
+                    start_time), description='Quedan {} para que empiece su sesión de estudio'.format(time_left), color=0xBEADB8)
         msg = await ctx.send(embed=embed)
         while True:  # bucle que compruebe el tiempo cada segundo
             
@@ -216,7 +216,7 @@ async def program(ctx, start_time, study_time=50, rest_time=10):
                                 title=' Su sesión de estudio empezará a las {}'.format(
                     start_time),
                                 description='Queda {} para que empiece su sesión de estudio'.format(time_left),
-                                color=0xFFF14A))
+                                color=0xBEADB8))
             
             if int(st[0]) == int(hour) and int(st[1]) == int(minute):
                 await ctx.invoke(bot.get_command('start'), int(study_time), int(rest_time))
@@ -231,16 +231,22 @@ bot.remove_command('help')
 async def help(ctx):
     embed = discord.Embed(title='Ayuda',
                           description='Si necesitas ayuda, aquí va una lista con los comandos disponibles, que tendrás que escribir en el canal pomodoro-bot.',
-                          color=0xFFF14A)
+                          color=0x6D3588)
     embed.add_field(name="Iniciar sesión", value="```!start <study_time> <rest_time>``` \n ***Ejemplo*** ```!start 25 5```  Se iniciará una sesión de 25 minutos de estudio y 5 de descanso. \nPor defecto, el uso del comando !start sin argumentos iniciará una sesión de 50 minutos de estudio y 10 de descanso)", inline=False)
     embed.add_field(name="Finalizar sesión",
                     value="```!end``` Al escribir este comando, el bot abandona la sala y termina la sesión", inline=False)
     embed.add_field(name="Programar una sesión", value="```!program <date> <study_time> <rest_time>``` \n ***Ejemplo*** ```!program 16:00 25 5``` Se iniciará una sesión de pomodoros de 25 minutos de estudio y 5 de descanso a las 16:00. \nRecuerda que a la hora que comience la sesión, debes estar en un canal de voz.", inline=False)
+    embed.add_field(name="Desmutear", value="```!unmute``` \n Se desactiva la opción \"Silenciar en servidor\".", inline=False)
 
     msg = await ctx.send(embed=embed)
 
-# Eventos
+@bot.command()
+async def unmute(ctx):
+    await ctx.author.edit(mute=False)
 
+# ------------------- #
+#       Eventos       #
+# ------------------- #
 
 @bot.event
 async def on_ready():
@@ -280,7 +286,7 @@ async def on_guild_join(guild):
         embed = discord.Embed(title='Hola 👋!',
                               description='Soy un sencillo Bot que te acompañará en tus sesiones de estudio y sacará de ti el máximo rendimiento.\n'
                               'Para aprender a usarme escribe en este mismo canal el comando: ```!help``` ',
-                              color=0xFFF14A)
+                              color=0x6D3588)
         await pomodoro_channel.send(embed=embed)
 
 # Ejecución
