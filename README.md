@@ -1,53 +1,71 @@
-# Pomodoro Bot
-Pomodoro es un sencillo Bot que te acompañará en tus sesiones de estudio y sacará de ti el máximo rendimiento.
-![Pomodoro Bot image](src/pomodoro.png)
+# Pomodoro Flip Clock
 
-## Empecemos
+Una aplicación web moderna de Pomodoro timer con estética visual de flip clock (reloj digital con fichas que voltean).
 
-Para añadir este Bot a tu servidor, [haz click aquí](https://discord.com/oauth2/authorize?client_id=1000722373336637570&permissions=8&scope=bot).
+## Características
 
-## Comandos
+✨ **Interfaz tipo Flip Clock**: Displays digitales con efecto de volteo estilo reloj vintage
+🍅 **Técnica Pomodoro**: Sesiones de 25 minutos de trabajo y 5 minutos de descanso
+📊 **Contador de Sesiones**: Visualiza cuántas sesiones completaste
+🎵 **Notificación de Audio**: Sonido cuando termina cada sesión
+📱 **Responsive Design**: Funciona perfectamente en cualquier dispositivo
+🎨 **Diseño Moderno**: Interfaz oscura con colores neón y efectos visuales
 
-### :books: Comenzar sesión de estudio
+## Tecnologías
 
-Para comenzar una sesión de estudio basta con usar el comando ```start``` en el canal de texto ```pomodoro-bot```
+- **React 18**: Librería de UI
+- **Vite**: Build tool rápido
+- **CSS3**: Animaciones y estilos modernos
+- **JavaScript Vanilla Audio API**: Para notificaciones de audio
 
-```!start <study> <rest>```  
+## Instalación
 
-#### Ejemplo
+```bash
+npm install
+```
 
-```!start 25 5```
+## Desarrollo
 
-Con este comando, comenzará una sesión de 25 minutos de estudio seguida de un descanso de 5.
+```bash
+npm run dev
+```
 
-Si no indicas ningún argumento después del comando start, por defecto se iniciarán sesiones de 50 minutos de estudio y 10 de descanso.
+Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 
-### :lotus_position: Terminar sesión de estudio
+## Build para Producción
 
-Si quieres terminar tu sesión de estudio, desconecta a Pomodoro Bot de tu sala con el comando ```end```
+```bash
+npm run build
+```
 
-```!end```  
+## Cómo usar
 
-### :stopwatch: Programar sesión de estudio
+1. **Iniciar/Pausar**: Haz clic en el botón "INICIAR" para comenzar la sesión
+2. **Reiniciar**: Vuelve a la sesión de trabajo completa
+3. **Saltar**: Salta a la siguiente sesión (trabajo → descanso o viceversa)
 
-Si no quieres comenzar en este momento la sesión, y quieres dejarla programada, puedes usar el comando ```program``` en el canal de texto ```pomodoro-bot```
+## Estructura del Proyecto
 
-```!program <date> <study> <rest>```  
+```
+src/
+├── components/
+│   ├── FlipClock.jsx        # Componente del reloj flip clock
+│   ├── FlipClock.css        # Estilos del flip clock
+│   ├── SessionController.jsx # Componentes de control (botones)
+│   └── SessionController.css # Estilos de los botones
+├── App.jsx                  # Componente principal
+├── App.css                  # Estilos principales
+├── index.css                # Estilos globales
+└── main.jsx                 # Punto de entrada
+```
 
-#### Ejemplo
+## Duración de las Sesiones
 
-```!start 16:00 25 5```
+- **Trabajo**: 25 minutos
+- **Descanso**: 5 minutos
 
-Con este comando, a las 16:00 comenzará una sesión de 25 minutos de estudio seguida de un descanso de 5.
+Puedes editar estos valores en `App.jsx` cambiando las variables `workDuration` y `breakDuration`.
 
-Si no indicas los dos últimos argumentos, por defecto se iniciarán sesiones de 50 minutos de estudio y 10 de descanso.
+---
 
-Recuerda que a la hora que hayas programado la sesión deberás encontrarte en una sala de voz, para que el Bot sepa a qué canal unirse.
-
-### :mute: Dejar de silenciar en servidor
-
-Si el Bot te ha silenciado automáticamente, puedes desmutearte utilizando el comando ```!unmute```
-
-### :question: Ayuda
-
-Si necesitas ayuda, tienes disponible el comando ```!help``` que te ayudará a recordar la sintaxis de los comandos
+Hecho con ❤️ para aumentar tu productividad
