@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { GiTomato } from 'react-icons/gi'
+import { FaCoffee, FaClock } from 'react-icons/fa'
 import FlipClock from './components/FlipClock'
 import SessionController from './components/SessionController'
 import './App.css'
@@ -13,55 +15,89 @@ function App() {
   const [workDuration, setWorkDuration] = useState(25)
   const [breakDuration, setBreakDuration] = useState(5)
   const [showSettings, setShowSettings] = useState(false)
+  const [soundEnabled, setSoundEnabled] = useState(true)
+
+  const totalRef = useRef(workDuration * 60)
+  const sessionTypeRef = useRef(sessionType)
+  const breakDurationRef = useRef(breakDuration)
+  const workDurationRef = useRef(workDuration)
+
+  // keep refs in sync
+  useEffect(() => { totalRef.current = minutes * 60 + seconds }, [minutes, seconds])
+  useEffect(() => { sessionTypeRef.current = sessionType }, [sessionType])
+  useEffect(() => { breakDurationRef.current = breakDuration }, [breakDuration])
+  useEffect(() => { workDurationRef.current = workDuration }, [workDuration])
 
   useEffect(() => {
     let interval = null
 
-    if (isRunning && (minutes > 0 || seconds > 0)) {
+    if (isRunning) {
+      // ensure totalRef has correct value
+      totalRef.current = minutes * 60 + seconds
+
       interval = setInterval(() => {
-        if (seconds > 0) {
-          setSeconds(seconds - 1)
-        } else if (minutes > 0) {
-          setMinutes(minutes - 1)
-          setSeconds(59)
+        if (totalRef.current > 0) {
+          totalRef.current -= 1
+          const m = Math.floor(totalRef.current / 60)
+          const s = totalRef.current % 60
+          setMinutes(m)
+          setSeconds(s)
         } else {
-          // Time's up!
-          setIsRunning(false)
+          // reached 00:00 -> transition to next session
           playNotificationSound()
-          
-          if (sessionType === 'work') {
-            setSessionsCompleted(sessionsCompleted + 1)
+
+          if (sessionTypeRef.current === 'work') {
+            setSessionsCompleted((prev) => prev + 1)
             setSessionType('break')
-            setMinutes(breakDuration)
-            setSeconds(0)
+            const next = breakDurationRef.current * 60
+            totalRef.current = next
+            setMinutes(Math.floor(next / 60))
+            setSeconds(next % 60)
+            setIsRunning(true)
           } else {
             setSessionType('work')
-            setMinutes(workDuration)
-            setSeconds(0)
+            const next = workDurationRef.current * 60
+            totalRef.current = next
+            setMinutes(Math.floor(next / 60))
+            setSeconds(next % 60)
+            setIsRunning(true)
           }
         }
       }, 1000)
-    } else if (!isRunning) {
-      clearInterval(interval)
     }
 
     return () => clearInterval(interval)
-  }, [isRunning, minutes, seconds, sessionType, sessionsCompleted])
+  }, [isRunning])
 
   const playNotificationSound = () => {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)()
-    const oscillator = audioContext.createOscillator()
-    const gainNode = audioContext.createGain()
+    if (!soundEnabled) return
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext
+      const audioContext = new AudioCtx()
+      // ensure context is resumed (some browsers require a user gesture)
+      if (audioContext.state === 'suspended' && audioContext.resume) {
+        audioContext.resume()
+      }
 
-    oscillator.connect(gainNode)
-    gainNode.connect(audioContext.destination)
+      const oscillator = audioContext.createOscillator()
+      const gainNode = audioContext.createGain()
 
-    oscillator.frequency.value = 800
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5)
+      oscillator.connect(gainNode)
+      gainNode.connect(audioContext.destination)
 
-    oscillator.start(audioContext.currentTime)
-    oscillator.stop(audioContext.currentTime + 0.5)
+      oscillator.frequency.value = 800
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5)
+
+      oscillator.start(audioContext.currentTime)
+      oscillator.stop(audioContext.currentTime + 0.5)
+    } catch (e) {
+      // fallback: try HTML Audio beep (silent failure is acceptable)
+      try {
+        const beep = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=')
+        beep.play().catch(() => {})
+      } catch (_) {}
+    }
   }
 
   const toggleTimer = () => {
@@ -77,7 +113,7 @@ function App() {
 
   const skipSession = () => {
     if (sessionType === 'work') {
-      setSessionsCompleted(sessionsCompleted + 1)
+      setSessionsCompleted((prev) => prev + 1)
       setSessionType('break')
       setMinutes(breakDuration)
     } else {
@@ -103,7 +139,7 @@ function App() {
       <div className="header-info">
         <div className="session-info">
           <span className={`session-badge ${sessionType}`}>
-            {sessionType === 'work' ? '🍅 Trabajo' : '☕ Descanso'}
+            {sessionType === 'work' ? <><GiTomato style={{marginRight:6}} />Trabajo</> : <><FaCoffee style={{marginRight:6}} />Descanso</>}
           </span>
           <span className="sessions-count">Sesiones: {sessionsCompleted}</span>
         </div>

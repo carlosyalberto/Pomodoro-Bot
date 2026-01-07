@@ -33,6 +33,19 @@
   border-color: #888888;
 }
 
+.theme-toggle .theme-icon {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.theme-toggle.dark .theme-icon {
+  color: #FFD54F; /* warm yellow for sun on dark background */
+}
+
+.theme-toggle.light .theme-icon {
+  color: #2a2a2a; /* dark color for moon on light background */
+}
+
 .theme-toggle:hover {
   transform: scale(1.05);
   border-color: #777777;
@@ -54,6 +67,22 @@
   letter-spacing: 0.5px;
   background: #2a2a2a;
   color: #ffffff;
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.control-btn .icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-btn .text {
+  display: inline;
 }
 
 .session-controller.light .control-btn {

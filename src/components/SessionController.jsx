@@ -1,4 +1,6 @@
 import './SessionController.css'
+import { BsSun, BsMoon } from 'react-icons/bs'
+import { FaPlay, FaPause, FaRedo, FaForward, FaClock } from 'react-icons/fa'
 
 export default function SessionController({ isRunning, onToggle, onReset, onSkip, isDarkMode, onThemeToggle, onOpenSettings, workDuration, breakDuration }) {
   return (
@@ -8,15 +10,16 @@ export default function SessionController({ isRunning, onToggle, onReset, onSkip
         onClick={onThemeToggle}
         title={isDarkMode ? 'Modo claro' : 'Modo oscuro'}
       >
-        {isDarkMode ? '🌙' : '☀️'}
+        {isDarkMode ? <BsSun className="theme-icon" size={20} /> : <BsMoon className="theme-icon" size={20} />}
       </button>
 
       <button
-        className="control-btn play-pause ${isRunning ? 'playing' : ''}"
+        className={`control-btn play-pause ${isRunning ? 'playing' : ''}`}
         onClick={onToggle}
         title={isRunning ? 'Pausar' : 'Iniciar'}
       >
-        {isRunning ? '⏸️ Pausar' : '▶️ Iniciar'}
+        <span className="icon">{isRunning ? <FaPause /> : <FaPlay />}</span>
+        <span className="text">{isRunning ? 'Pausar' : 'Iniciar'}</span>
       </button>
 
       <button
@@ -24,7 +27,8 @@ export default function SessionController({ isRunning, onToggle, onReset, onSkip
         onClick={onReset}
         title="Reiniciar"
       >
-        🔄 Reiniciar
+        <span className="icon"><FaRedo /></span>
+        <span className="text">Reiniciar</span>
       </button>
 
       <button
@@ -32,7 +36,8 @@ export default function SessionController({ isRunning, onToggle, onReset, onSkip
         onClick={onSkip}
         title="Saltar sesión"
       >
-        ⏭️ Saltar
+        <span className="icon"><FaForward /></span>
+        <span className="text">Saltar</span>
       </button>
 
       <button
@@ -40,7 +45,8 @@ export default function SessionController({ isRunning, onToggle, onReset, onSkip
         onClick={onOpenSettings}
         title={`Personalizar: ${workDuration}m estudio, ${breakDuration}m descanso`}
       >
-        ⏰ Personalizar
+        <span className="icon"><FaClock /></span>
+        <span className="text">Personalizar</span>
       </button>
     </div>
   )
