@@ -16,6 +16,8 @@ function App() {
   const [breakDuration, setBreakDuration] = useState(5)
   const [showSettings, setShowSettings] = useState(false)
   const [soundEnabled, setSoundEnabled] = useState(true)
+  const [tempWork, setTempWork] = useState(String(workDuration))
+  const [tempBreak, setTempBreak] = useState(String(breakDuration))
 
   const totalRef = useRef(workDuration * 60)
   const sessionTypeRef = useRef(sessionType)
@@ -147,7 +149,7 @@ function App() {
 
       <FlipClock minutes={minutes} seconds={seconds} sessionType={sessionType} isDarkMode={isDarkMode} />
 
-      <div className="footer-controls">
+        <div className="footer-controls">
         <SessionController
           isRunning={isRunning}
           onToggle={toggleTimer}
@@ -155,7 +157,11 @@ function App() {
           onSkip={skipSession}
           isDarkMode={isDarkMode}
           onThemeToggle={() => setIsDarkMode(!isDarkMode)}
-          onOpenSettings={() => setShowSettings(true)}
+          onOpenSettings={() => {
+            setTempWork(String(workDuration))
+            setTempBreak(String(breakDuration))
+            setShowSettings(true)
+          }}
           workDuration={workDuration}
           breakDuration={breakDuration}
         />
@@ -171,8 +177,8 @@ function App() {
                 type="number"
                 min="1"
                 max="60"
-                value={workDuration}
-                onChange={(e) => setWorkDuration(Math.max(1, parseInt(e.target.value) || 25))}
+                value={tempWork}
+                onChange={(e) => setTempWork(e.target.value)}
               />
             </div>
             <div className="settings-group">
@@ -181,12 +187,12 @@ function App() {
                 type="number"
                 min="1"
                 max="60"
-                value={breakDuration}
-                onChange={(e) => setBreakDuration(Math.max(1, parseInt(e.target.value) || 5))}
+                value={tempBreak}
+                onChange={(e) => setTempBreak(e.target.value)}
               />
             </div>
             <div className="settings-buttons">
-              <button className="settings-btn save" onClick={() => handleSettingsChange(workDuration, breakDuration)}>
+              <button className="settings-btn save" onClick={() => handleSettingsChange(Math.max(1, parseInt(tempWork) || 25), Math.max(1, parseInt(tempBreak) || 5))}>
                 Guardar
               </button>
               <button className="settings-btn cancel" onClick={() => setShowSettings(false)}>
