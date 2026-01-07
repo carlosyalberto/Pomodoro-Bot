@@ -23,6 +23,12 @@ function App() {
   const sessionTypeRef = useRef(sessionType)
   const breakDurationRef = useRef(breakDuration)
   const workDurationRef = useRef(workDuration)
+  // tone preview parameters
+  const [workFreqs, setWorkFreqs] = useState([880,1040,1318])
+  const [workVol, setWorkVol] = useState(0.32)
+  
+
+  
 
   // keep refs in sync
   useEffect(() => { totalRef.current = minutes * 60 + seconds }, [minutes, seconds])
@@ -46,7 +52,7 @@ function App() {
           setSeconds(s)
         } else {
           // reached 00:00 -> transition to next session
-          playNotificationSound()
+          playEndSound(sessionTypeRef.current)
 
           if (sessionTypeRef.current === 'work') {
             setSessionsCompleted((prev) => prev + 1)
@@ -71,30 +77,40 @@ function App() {
     return () => clearInterval(interval)
   }, [isRunning])
 
-  const playNotificationSound = () => {
+  const playEndSound = (type) => {
     if (!soundEnabled) return
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext
-      const audioContext = new AudioCtx()
-      // ensure context is resumed (some browsers require a user gesture)
-      if (audioContext.state === 'suspended' && audioContext.resume) {
-        audioContext.resume()
-      }
+      const ac = new AudioCtx()
+      if (ac.state === 'suspended' && ac.resume) ac.resume()
 
-      const oscillator = audioContext.createOscillator()
-      const gainNode = audioContext.createGain()
+      const now = ac.currentTime
+      const masterGain = ac.createGain()
+      masterGain.connect(ac.destination)
 
-      oscillator.connect(gainNode)
-      gainNode.connect(audioContext.destination)
+      // Different melodies for work end vs break end
+      // use configured workFreqs for both work and break (break = reversed)
+      const freqs = type === 'work' ? workFreqs : [...workFreqs].reverse()
+      let offset = 0
+      freqs.forEach((f) => {
+        const o = ac.createOscillator()
+        const g = ac.createGain()
+        o.type = 'sine'
+        o.frequency.value = f
+        o.connect(g)
+        g.connect(masterGain)
 
-      oscillator.frequency.value = 800
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5)
+        const dur = 0.16
+        const start = now + offset
+        g.gain.setValueAtTime(0.0001, start)
+        g.gain.linearRampToValueAtTime(workVol, start + 0.01)
+        g.gain.exponentialRampToValueAtTime(0.001, start + dur)
 
-      oscillator.start(audioContext.currentTime)
-      oscillator.stop(audioContext.currentTime + 0.5)
+        o.start(start)
+        o.stop(start + dur + 0.02)
+        offset += dur
+      })
     } catch (e) {
-      // fallback: try HTML Audio beep (silent failure is acceptable)
       try {
         const beep = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=')
         beep.play().catch(() => {})
@@ -146,6 +162,8 @@ function App() {
           <span className="sessions-count">Sesiones: {sessionsCompleted}</span>
         </div>
       </div>
+
+      
 
       <FlipClock minutes={minutes} seconds={seconds} sessionType={sessionType} isDarkMode={isDarkMode} />
 
