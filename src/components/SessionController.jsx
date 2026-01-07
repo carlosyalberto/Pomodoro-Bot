@@ -3,18 +3,13 @@ import './SessionController.css'
 export default function SessionController({ isRunning, onToggle, onReset, onSkip, isDarkMode, onThemeToggle, onOpenSettings, workDuration, breakDuration }) {
   return (
     <div className={`session-controller ${isDarkMode ? 'dark' : 'light'}`}>
-      <div className="theme-toggle-container">
-        <button
-          className={`theme-toggle ${isDarkMode ? 'dark' : 'light'}`}
-          onClick={onThemeToggle}
-          title={isDarkMode ? 'Modo claro' : 'Modo oscuro'}
-        >
-          <span className="toggle-circle">
-            <span className="icon moon">🌙</span>
-            <span className="icon sun">☀️</span>
-          </span>
-        </button>
-      </div>
+      <button
+        className={`theme-toggle ${isDarkMode ? 'dark' : 'light'}`}
+        onClick={onThemeToggle}
+        title={isDarkMode ? 'Modo claro' : 'Modo oscuro'}
+      >
+        {isDarkMode ? '🌙' : '☀️'}
+      </button>
 
       <button
         className="control-btn play-pause ${isRunning ? 'playing' : ''}"

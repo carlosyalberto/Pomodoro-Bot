@@ -7,84 +7,39 @@
   margin-top: 10px;
 }
 
-.theme-toggle-container {
-  display: flex;
-  align-items: center;
-}
-
 .theme-toggle {
-  position: relative;
-  width: 60px;
-  height: 32px;
-  background: #333333;
-  border: 1px solid #555555;
-  border-radius: 16px;
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid #555555;
+  background: #2a2a2a;
+  color: #ffffff;
+  font-size: 1.5rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 0 4px;
   display: flex;
   align-items: center;
-  overflow: hidden;
+  justify-content: center;
+  transition: all 0.3s ease;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  z-index: 100;
 }
 
 .theme-toggle.light {
-  background: #cccccc;
-  border-color: #999999;
+  background: #e8e8e8;
+  border-color: #888888;
 }
 
-.toggle-circle {
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  background: #ffffff;
-  border-radius: 50%;
-  transition: left 0.3s ease;
-  left: 4px;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.theme-toggle:hover {
+  transform: scale(1.05);
+  border-color: #777777;
 }
 
-.theme-toggle.light .toggle-circle {
-  left: 32px;
-}
-
-.icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  position: absolute;
-  transition: opacity 0.3s ease;
-}
-
-.icon.moon {
-  opacity: 1;
-}
-
-.icon.sun {
-  opacity: 0;
-}
-
-.theme-toggle.light .icon.moon {
-  opacity: 0;
-}
-
-.theme-toggle.light .icon.sun {
-  opacity: 1;
-}
-
-.toggle-label {
-  position: relative;
-  font-size: 0.9rem;
-  transition: transform 0.3s ease;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 6px;
-  z-index: 1;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+.session-controller.light .theme-toggle:hover {
+  border-color: #666666;
 }
 
 .control-btn {
