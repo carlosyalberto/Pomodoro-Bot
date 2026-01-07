@@ -1,0 +1,154 @@
+.flip-clock-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.flip-clock {
+  perspective: 1000px;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: auto;
+  height: auto;
+}
+
+.flip-clock.light {
+  color: #000000;
+}
+
+.flip-clock.work {
+}
+
+.flip-clock.break {
+}
+
+.flip-clock-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.digit-group {
+  display: flex;
+  gap: 8px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 25vw;
+  height: 70vh;
+  justify-content: center;
+  align-items: center;
+}
+
+.time-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3em;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.flip-card {
+  position: relative;
+  width: 100%;
+  min-width: 100px;
+  height: 25vw;
+  flex-shrink: 0;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18vw;
+  font-weight: bold;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 2px;
+  border-radius: 32px;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.flip-card-front {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  color: #dbdbdb;
+  transition: all 0.3s ease;
+}
+
+.flip-card-back {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  color: #dbdbdb;
+  transform: rotateY(180deg);
+  transition: all 0.3s ease;
+}
+
+.flip-clock-container.light .flip-card-front,
+.flip-clock-container.light .flip-card-back {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  color: #000000;
+}
+
+.flip-label {
+  display: none;
+}
+
+.separator {
+  display: none;
+}
+
+.flip-clock-container.light .separator {
+  color: #aaaaaa;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0.3;
+  }
+}
+
+@media (max-width: 600px) {
+  .flip-clock {
+    padding: 20px;
+  }
+
+  .flip-card-front,
+  .flip-card-back {
+    font-size: 2.5rem;
+  }
+
+  .separator {
+    font-size: 2.2rem;
+  }
+
+  .flip-label {
+    font-size: 0.65rem;
+    bottom: -25px;
+  }
+}

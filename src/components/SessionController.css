@@ -1,0 +1,188 @@
+.session-controller {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.theme-toggle-container {
+  display: flex;
+  align-items: center;
+}
+
+.theme-toggle {
+  position: relative;
+  width: 60px;
+  height: 32px;
+  background: #333333;
+  border: 1px solid #555555;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.theme-toggle.light {
+  background: #cccccc;
+  border-color: #999999;
+}
+
+.toggle-circle {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: left 0.3s ease;
+  left: 4px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle.light .toggle-circle {
+  left: 32px;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  position: absolute;
+  transition: opacity 0.3s ease;
+}
+
+.icon.moon {
+  opacity: 1;
+}
+
+.icon.sun {
+  opacity: 0;
+}
+
+.theme-toggle.light .icon.moon {
+  opacity: 0;
+}
+
+.theme-toggle.light .icon.sun {
+  opacity: 1;
+}
+
+.toggle-label {
+  position: relative;
+  font-size: 0.9rem;
+  transition: transform 0.3s ease;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 6px;
+  z-index: 1;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.control-btn {
+  padding: 8px 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid #555555;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  letter-spacing: 0.5px;
+  background: #2a2a2a;
+  color: #ffffff;
+}
+
+.session-controller.light .control-btn {
+  background: #d8d8d8;
+  border-color: #888888;
+  color: #000000;
+}
+
+.control-btn:hover {
+  transform: translateY(-2px);
+  border-color: #777777;
+  background: #333333;
+}
+
+.session-controller.light .control-btn:hover {
+  background: #c0c0c0;
+  border-color: #666666;
+}
+
+.control-btn:active {
+  transform: translateY(0px);
+}
+
+.play-pause {
+  background: #1a1a1a;
+  border: 1px solid #555555;
+  color: #ffffff;
+  min-width: 100px;
+}
+
+.play-pause:hover {
+  background: #222222;
+  border-color: #777777;
+}
+
+.play-pause.playing {
+  background: #222222;
+  border-color: #666666;
+}
+
+.reset {
+  background: #1a1a1a;
+  border: 1px solid #555555;
+  color: #ffffff;
+}
+
+.reset:hover {
+  background: #222222;
+  border-color: #777777;
+}
+
+.skip {
+  background: #1a1a1a;
+  border: 1px solid #555555;
+  color: #ffffff;
+}
+
+.skip:hover {
+  background: #222222;
+  border-color: #777777;
+}
+
+.settings {
+  background: #1a1a1a;
+  border: 1px solid #555555;
+  color: #ffffff;
+}
+
+.settings:hover {
+  background: #222222;
+  border-color: #777777;
+}
+
+@media (max-width: 600px) {
+  .session-controller {
+    gap: 8px;
+  }
+
+  .control-btn {
+    padding: 6px 15px;
+    font-size: 0.75rem;
+  }
+
+  .play-pause {
+    min-width: 80px;
+  }
+}
