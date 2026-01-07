@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { GiTomato } from 'react-icons/gi'
-import { FaCoffee, FaClock } from 'react-icons/fa'
+import { FaCoffee, FaClock, FaMusic, FaVolumeMute } from 'react-icons/fa'
 import FlipClock from './components/FlipClock'
 import SessionController from './components/SessionController'
 import './App.css'
@@ -15,6 +15,7 @@ function App() {
   const [workDuration, setWorkDuration] = useState(25)
   const [breakDuration, setBreakDuration] = useState(5)
   const [showSettings, setShowSettings] = useState(false)
+  const [ytPlaying, setYtPlaying] = useState(false)
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [tempWork, setTempWork] = useState(String(workDuration))
   const [tempBreak, setTempBreak] = useState(String(breakDuration))
@@ -218,6 +219,27 @@ function App() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* YouTube music toggle (plays in background via hidden iframe) */}
+      <button
+        className={`yt-button ${ytPlaying ? 'playing' : ''} ${isDarkMode ? 'dark' : 'light'}`}
+        onClick={() => setYtPlaying((p) => !p)}
+        aria-label={ytPlaying ? 'Detener música' : 'Reproducir música'}
+      >
+        {ytPlaying ? <FaVolumeMute size={18} /> : <FaMusic size={20} />}
+      </button>
+
+      {/* Hidden iframe to keep playback alive without foreground overlay */}
+      {ytPlaying && (
+        <div style={{display: 'none'}} aria-hidden="true">
+          <iframe
+            title="YouTube Live Hidden"
+            src="https://www.youtube.com/embed/XSXEaikz0Bc?autoplay=1&controls=0&rel=0"
+            frameBorder="0"
+            allow="autoplay; encrypted-media"
+          />
         </div>
       )}
     </div>
