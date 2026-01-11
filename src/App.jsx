@@ -1,9 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { GiTomato } from 'react-icons/gi'
-import { FaCoffee, FaClock, FaMusic, FaVolumeMute } from 'react-icons/fa'
+import { FaCoffee, FaClock, FaMusic, FaVolumeMute, FaGoogle, FaApple, FaSignOutAlt, FaUser } from 'react-icons/fa'
 import FlipClock from './components/FlipClock'
 import SessionController from './components/SessionController'
 import './App.css'
+import { signInWithGoogle, signInWithApple, signOutUser, onAuthChange, saveUserPreferences, loadUserPreferences, createUserWithEmail, signInWithEmail } from './auth/firebase'
+import { Routes, Route, useNavigate } from 'react-router-dom'
+import Dashboard from './Dashboard'
+import { saveStudySession } from './auth/firebase'
 
 function App() {
   const [minutes, setMinutes] = useState(25)
@@ -19,8 +23,19 @@ function App() {
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [tempWork, setTempWork] = useState(String(workDuration))
   const [tempBreak, setTempBreak] = useState(String(breakDuration))
+  const [user, setUser] = useState(null)
+  const [showAuthPopup, setShowAuthPopup] = useState(false)
+  const [authEmail, setAuthEmail] = useState('')
+  const [authPassword, setAuthPassword] = useState('')
+  const [authMode, setAuthMode] = useState('signin') // 'signin' or 'signup'
+  const [authError, setAuthError] = useState(null)
+
+  const [showAuthMenu, setShowAuthMenu] = useState(false)
+  // dashboard navigation handled via router
 
   const totalRef = useRef(workDuration * 60)
+  const authButtonRef = useRef(null)
+  const authMenuRef = useRef(null)
   const sessionTypeRef = useRef(sessionType)
   const breakDurationRef = useRef(breakDuration)
   const workDurationRef = useRef(workDuration)
@@ -55,6 +70,15 @@ function App() {
           // reached 00:00 -> transition to next session
           playEndSound(sessionTypeRef.current)
 
+          // save completed work session
+          try {
+            if (sessionTypeRef.current === 'work' && user) {
+              // record a completed work session (duration in seconds)
+              const durationSec = workDurationRef.current * 60
+              saveStudySession(user.uid, { type: 'work', duration: durationSec }).catch((e) => console.warn('saveStudySession failed', e))
+            }
+          } catch (e) { console.warn(e) }
+
           if (sessionTypeRef.current === 'work') {
             setSessionsCompleted((prev) => prev + 1)
             setSessionType('break')
@@ -77,6 +101,84 @@ function App() {
 
     return () => clearInterval(interval)
   }, [isRunning])
+
+  // Auth state listener: load preferences when user logs in
+  useEffect(() => {
+    const unsub = onAuthChange(async (u) => {
+      setUser(u)
+      if (u) {
+        try {
+          const prefs = await loadUserPreferences(u.uid)
+          if (prefs) {
+            if (typeof prefs.workDuration === 'number') setWorkDuration(prefs.workDuration)
+            if (typeof prefs.breakDuration === 'number') setBreakDuration(prefs.breakDuration)
+            if (typeof prefs.isDarkMode === 'boolean') setIsDarkMode(prefs.isDarkMode)
+          }
+        } catch (e) {
+          console.warn('Could not load user preferences', e)
+        }
+      }
+    })
+    return () => unsub && unsub()
+  }, [])
+
+  // Save preferences when user is signed in
+  useEffect(() => {
+    if (!user) return
+    const prefs = { workDuration, breakDuration, isDarkMode }
+    saveUserPreferences(user.uid, prefs).catch((e) => console.warn('Save prefs failed', e))
+  }, [user, workDuration, breakDuration, isDarkMode])
+
+  // close auth menu when clicking outside
+  useEffect(() => {
+    if (!showAuthMenu) return
+    function onDocClick(e) {
+      if (!authMenuRef.current) return
+      if (authMenuRef.current.contains(e.target)) return
+      if (authButtonRef.current && authButtonRef.current.contains(e.target)) return
+      setShowAuthMenu(false)
+    }
+    document.addEventListener('mousedown', onDocClick)
+    return () => document.removeEventListener('mousedown', onDocClick)
+  }, [showAuthMenu])
+
+  const openDashboard = async () => {
+    setShowAuthMenu(false)
+    if (!user) return
+    navigate('/dashboard')
+  }
+
+  const handleSignInGoogle = async () => {
+    try { await signInWithGoogle() } catch (e) { console.error(e) }
+  }
+
+  const handleSignInApple = async () => {
+    try { await signInWithApple() } catch (e) { console.error(e) }
+  }
+
+  const handleSignOut = async () => {
+    try { await signOutUser(); setUser(null) } catch (e) { console.error(e) }
+  }
+
+  const handleEmailSignUp = async () => {
+    setAuthError(null)
+    try {
+      await createUserWithEmail(authEmail, authPassword)
+      setShowAuthPopup(false)
+    } catch (e) {
+      setAuthError(e.message || String(e))
+    }
+  }
+
+  const handleEmailSignIn = async () => {
+    setAuthError(null)
+    try {
+      await signInWithEmail(authEmail, authPassword)
+      setShowAuthPopup(false)
+    } catch (e) {
+      setAuthError(e.message || String(e))
+    }
+  }
 
   const playEndSound = (type) => {
     if (!soundEnabled) return
@@ -153,16 +255,57 @@ function App() {
     setShowSettings(false)
   }
 
+  const navigate = useNavigate()
+
   return (
-    <div className={`app-container ${isDarkMode ? 'dark' : 'light'}`}>
+    <Routes>
+      <Route path="/dashboard" element={<Dashboard user={user} />} />
+      <Route path="/" element={(
+        <div className={`app-container ${isDarkMode ? 'dark' : 'light'}`}>
       <div className="header-info">
         <div className="session-info">
           <span className={`session-badge ${sessionType}`}>
-            {sessionType === 'work' ? <><GiTomato style={{marginRight:6}} />Trabajo</> : <><FaCoffee style={{marginRight:6}} />Descanso</>}
+            {sessionType === 'work' ? <><GiTomato style={{marginRight:6, color:'#ff6b35'}} />Trabajo</> : <><FaCoffee style={{marginRight:6, color:'#8B5E3C'}} />Descanso</>}
           </span>
           <span className="sessions-count">Sesiones: {sessionsCompleted}</span>
         </div>
+        
       </div>
+      {/* Top-right auth button */}
+      <button
+        ref={authButtonRef}
+        className={`auth-button ${isDarkMode ? 'dark' : 'light'}`}
+        onClick={() => {
+          if (user) setShowAuthMenu((s) => !s)
+          else setShowAuthPopup(true)
+        }}
+        aria-label={user ? 'Cuenta' : 'Iniciar sesión'}
+        style={{position: 'fixed', right: 18, top: 12, zIndex:1200}}
+      >
+        {user && user.photoURL ? (
+          <img src={user.photoURL} alt={user.displayName || 'avatar'} className="auth-avatar" />
+        ) : (
+          <FaUser size={18} />
+        )}
+      </button>
+
+      {showAuthMenu && user && (
+        <div ref={authMenuRef} className={`auth-menu ${isDarkMode ? 'dark' : 'light'}`} style={{position:'fixed', right:18, top:64, zIndex:1300}}>
+          <div className="auth-menu-user">
+            {user.photoURL ? <img src={user.photoURL} alt="avatar" className="auth-avatar-sm" /> : <FaUser />}
+            <div style={{marginLeft:8}}>
+              <div style={{fontSize:13, fontWeight:600}}>{user.displayName || user.email}</div>
+              {user.email && <div style={{fontSize:12, color:'#999'}}>{user.email}</div>}
+            </div>
+          </div>
+          <div style={{marginTop:10}}>
+            <div style={{display:'flex', gap:8}}>
+              <button className="settings-btn save" onClick={() => openDashboard()}>Dashboard</button>
+              <button className="settings-btn cancel" onClick={async () => { await handleSignOut(); setShowAuthMenu(false) }}>Cerrar sesión</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       
 
@@ -222,6 +365,38 @@ function App() {
         </div>
       )}
 
+      {showAuthPopup && (
+        <div className="auth-modal" onClick={() => setShowAuthPopup(false)}>
+          <div className="auth-content" onClick={(e) => e.stopPropagation()}>
+            <h2>{authMode === 'signin' ? 'Iniciar sesión' : 'Registrarse'}</h2>
+            {authError && <div style={{color:'salmon', marginBottom:8}}>{authError}</div>}
+            <div className="settings-group">
+              <label>Email</label>
+              <input type="email" value={authEmail} onChange={(e)=> setAuthEmail(e.target.value)} />
+            </div>
+            <div className="settings-group">
+              <label>Contraseña</label>
+              <input type="password" value={authPassword} onChange={(e)=> setAuthPassword(e.target.value)} />
+            </div>
+            <div style={{display:'flex', gap:8, marginTop:10}}>
+              {authMode === 'signin' ? (
+                <button className="settings-btn save" onClick={handleEmailSignIn}>Iniciar</button>
+              ) : (
+                <button className="settings-btn save" onClick={handleEmailSignUp}>Crear cuenta</button>
+              )}
+              <button className="settings-btn cancel" onClick={() => setAuthMode(authMode === 'signin' ? 'signup' : 'signin')}>{authMode === 'signin' ? 'Crear cuenta' : '¿Ya tienes cuenta?'}</button>
+            </div>
+
+            <div style={{marginTop:12, display:'flex', gap:8, flexDirection:'column'}}>
+              <button className="control-btn" onClick={handleSignInGoogle}><FaGoogle /> Google</button>
+              <button className="control-btn" onClick={handleSignInApple}><FaApple /> Apple</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      
+
       {/* YouTube music toggle (plays in background via hidden iframe) */}
       <button
         className={`yt-button ${ytPlaying ? 'playing' : ''} ${isDarkMode ? 'dark' : 'light'}`}
@@ -242,7 +417,9 @@ function App() {
           />
         </div>
       )}
-    </div>
+        </div>
+      )} />
+    </Routes>
   )
 }
 
