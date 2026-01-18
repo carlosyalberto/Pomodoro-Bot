@@ -3,6 +3,7 @@ import { GiTomato } from 'react-icons/gi'
 import { FaCoffee, FaClock, FaMusic, FaVolumeMute, FaGoogle, FaApple, FaSignOutAlt, FaUser } from 'react-icons/fa'
 import FlipClock from './components/FlipClock'
 import SessionController from './components/SessionController'
+import RatingModal from './components/RatingModal'
 import './App.css'
 import { signInWithGoogle, signInWithApple, signOutUser, onAuthChange, saveUserPreferences, loadUserPreferences, createUserWithEmail, signInWithEmail } from './auth/firebase'
 import { Routes, Route, useNavigate } from 'react-router-dom'
@@ -31,6 +32,8 @@ function App() {
   const [authError, setAuthError] = useState(null)
 
   const [showAuthMenu, setShowAuthMenu] = useState(false)
+  const [showRatingModal, setShowRatingModal] = useState(false)
+  const [lastSessionType, setLastSessionType] = useState('work')
   // dashboard navigation handled via router
 
   const totalRef = useRef(workDuration * 60)
@@ -70,12 +73,12 @@ function App() {
           // reached 00:00 -> transition to next session
           playEndSound(sessionTypeRef.current)
 
-          // save completed work session
+          // save completed work session (prompt for rating)
           try {
             if (sessionTypeRef.current === 'work' && user) {
-              // record a completed work session (duration in seconds)
-              const durationSec = workDurationRef.current * 60
-              saveStudySession(user.uid, { type: 'work', duration: durationSec }).catch((e) => console.warn('saveStudySession failed', e))
+              // show rating modal before saving
+              setLastSessionType('work')
+              setShowRatingModal(true)
             }
           } catch (e) { console.warn(e) }
 
@@ -257,6 +260,26 @@ function App() {
 
   const navigate = useNavigate()
 
+  const handleRatingSubmit = (rating) => {
+    // Save session with rating
+    if (user) {
+      const durationSec = workDurationRef.current * 60
+      const now = new Date()
+      saveStudySession(user.uid, {
+        type: 'work',
+        duration: durationSec,
+        rating: rating,
+        completedAt: now.toISOString(),
+        meta: { rating: rating }
+      }).catch((e) => console.warn('saveStudySession failed', e))
+    }
+    setShowRatingModal(false)
+  }
+
+  const handleRatingClose = () => {
+    setShowRatingModal(false)
+  }
+
   return (
     <Routes>
       <Route path="/dashboard" element={<Dashboard user={user} />} />
@@ -393,6 +416,14 @@ function App() {
             </div>
           </div>
         </div>
+      )}
+
+      {showRatingModal && (
+        <RatingModal 
+          onSubmit={handleRatingSubmit}
+          onClose={handleRatingClose}
+          sessionType={lastSessionType}
+        />
       )}
 
       

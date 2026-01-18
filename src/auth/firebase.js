@@ -86,6 +86,8 @@ export async function saveStudySession(uid, session) {
     type: session.type || 'work',
     duration: session.duration || 0,
     note: session.note || null,
+    rating: session.rating || null,
+    completedAt: session.completedAt || null,
     createdAt: serverTimestamp(),
     meta: session.meta || null,
   }

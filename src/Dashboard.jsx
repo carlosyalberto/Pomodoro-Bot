@@ -94,7 +94,10 @@ export default function Dashboard({ user }) {
                             <div className="recent-type">{s.type}</div>
                             <div className="recent-time">{created.toLocaleString()}</div>
                           </div>
-                          <div className="recent-meta">Duración: {Math.round((s.duration || 0) / 60)} min</div>
+                          <div className="recent-meta">
+                            <span>Duración: {Math.round((s.duration || 0) / 60)} min</span>
+                            {s.rating && <span className="rating-badge">⭐ {s.rating}/5</span>}
+                          </div>
                         </div>
                       )
                     })}
