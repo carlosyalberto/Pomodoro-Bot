@@ -16,7 +16,15 @@ function App() {
   const [isRunning, setIsRunning] = useState(false)
   const [sessionType, setSessionType] = useState('work') // 'work' or 'break'
   const [sessionsCompleted, setSessionsCompleted] = useState(0)
-  const [isDarkMode, setIsDarkMode] = useState(true)
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    try {
+      const v = localStorage.getItem('isDarkMode')
+      return v !== null ? JSON.parse(v) : true
+    } catch (e) {
+      return true
+    }
+  })
+  const [prefsLoaded, setPrefsLoaded] = useState(false)
   const [workDuration, setWorkDuration] = useState(25)
   const [breakDuration, setBreakDuration] = useState(5)
   const [showSettings, setShowSettings] = useState(false)
@@ -121,13 +129,16 @@ function App() {
           console.warn('Could not load user preferences', e)
         }
       }
+      // mark that preferences have been loaded (or attempted)
+      setPrefsLoaded(true)
     })
     return () => unsub && unsub()
   }, [])
 
   // Save preferences when user is signed in
   useEffect(() => {
-    if (!user) return
+    // do not save until we have loaded existing preferences to avoid overwriting them
+    if (!user || !prefsLoaded) return
     const prefs = { workDuration, breakDuration, isDarkMode }
     saveUserPreferences(user.uid, prefs).catch((e) => console.warn('Save prefs failed', e))
   }, [user, workDuration, breakDuration, isDarkMode])
@@ -144,6 +155,13 @@ function App() {
     document.addEventListener('mousedown', onDocClick)
     return () => document.removeEventListener('mousedown', onDocClick)
   }, [showAuthMenu])
+
+  // persist theme choice to localStorage for all users
+  useEffect(() => {
+    try {
+      localStorage.setItem('isDarkMode', JSON.stringify(isDarkMode))
+    } catch (e) {}
+  }, [isDarkMode])
 
   const openDashboard = async () => {
     setShowAuthMenu(false)
