@@ -33,6 +33,7 @@
 .stat .value{font-size:20px;font-weight:700;margin-top:6px}
 .content{display:grid;grid-template-columns:2fr 1fr;gap:16px}
 .chart-placeholder{height:220px;display:flex;align-items:center;justify-content:center;color:var(--muted);border-radius:6px;background:linear-gradient(180deg,#fbfdff,#fff)}
+.card.chart{display:flex;flex-direction:column;gap:8px}
 .recent-list{max-height:420px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding-top:8px}
 .recent-item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:6px;border:1px solid #f1f5f9}
 .recent-type{font-weight:600}

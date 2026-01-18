@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { fetchUserSessions } from './auth/firebase'
 import { useNavigate } from 'react-router-dom'
 import './Dashboard.css'
+import ScoreChart from './components/ScoreChart'
 
 export default function Dashboard({ user }) {
   const [sessions, setSessions] = useState([])
@@ -79,7 +80,7 @@ export default function Dashboard({ user }) {
               <section className="content">
                 <div className="card chart">
                   <h3>Actividad</h3>
-                  <div className="chart-placeholder">Gráfico de actividad (próximamente)</div>
+                  <ScoreChart sessions={sessions} />
                 </div>
 
                 <div className="card recent">
